@@ -6,17 +6,12 @@ import (
 	"time"
 )
 
-type Tile struct {
-	letter rune
-	score  int
-}
-
 type TileBag struct {
 	tiles []Tile
 	rng   *rand.Rand
 }
 
-func (tg *TileBag) pickTile() Tile {
+func (tg *TileBag) PickTile() Tile {
 	pos := tg.rng.Intn(len(tg.tiles))
 	return tg.tiles[pos]
 }

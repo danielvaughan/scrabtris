@@ -16,7 +16,7 @@ func TestPickingTiles(t *testing.T) {
 
 func pickTile(tg *TileBag, tiles []Tile, t *testing.T) {
 	pickedTile := tg.pickTile()
-	t.Log(fmt.Sprintf("Picked: %s", string(pickedTile.letter)))
+	t.Log(fmt.Sprintf("Picked: %s", string(pickedTile.Letter)))
 	found := false
 	for _, tile := range tiles {
 		if pickedTile == tile {
