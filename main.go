@@ -2,17 +2,24 @@ package main
 
 import (
 	"github.com/danielvaughan/scrabtris/pkg/game"
-	"github.com/danielvaughan/scrabtris/pkg/game/board"
-	"github.com/danielvaughan/scrabtris/pkg/game/tile_bag"
-	"github.com/danielvaughan/scrabtris/pkg/pub_sub"
+	"github.com/nsf/termbox-go"
 )
 
 func main() {
-	tiles := []tile_bag.Tile{{'A', 1}, {'B', 1}, {'C', 1}}
-	tb := tile_bag.NewTileBag(tiles)
-	ps := pub_sub.NewPubSub()
-	b := board.NewBoard(9, 10, ps)
-	b.Render()
+	err := termbox.Init()
+	if err != nil {
+		panic(err)
+	}
+	defer termbox.Close()
+
+	termbox.SetInputMode(termbox.InputEsc)
+	termbox.Flush()
+
+	tiles := []game.Tile{{'A', 1}, {'B', 1}, {'C', 1}}
+	tb := game.NewTileBag(tiles)
+	ps := game.NewPubSub()
+	b := game.NewBoard(ps)
 	g := game.NewGame(tb, b, ps, 1)
 	g.Start()
+	game.WaitKeyInput()
 }

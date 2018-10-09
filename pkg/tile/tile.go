@@ -1,4 +1,4 @@
-package tile_bag
+package tile
 
 type Tile struct {
 	Letter rune
