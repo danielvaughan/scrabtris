@@ -25,7 +25,9 @@ func TestPickingUKTiles(t *testing.T) {
 	for i := 0; i < 1000; i++ {
 		pickedTile := b.PickTile()
 		t.Log(fmt.Sprintf("Picked: %s", string(pickedTile.Letter)))
-		assert.True(t, pickedTile.Score > 0)
+		if pickedTile.Letter != '_' {
+			assert.True(t, pickedTile.Score > 0)
+		}
 		assert.True(t, pickedTile.Letter > 0)
 	}
 }
