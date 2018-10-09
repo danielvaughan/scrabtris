@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/danielvaughan/scrabtris/pkg/bag"
 	"github.com/danielvaughan/scrabtris/pkg/game"
 	"github.com/nsf/termbox-go"
 )
@@ -15,11 +16,10 @@ func main() {
 	termbox.SetInputMode(termbox.InputEsc)
 	termbox.Flush()
 
-	tiles := []game.Tile{{'A', 1}, {'B', 1}, {'C', 1}}
-	tb := game.NewTileBag(tiles)
+	bag := bag.NewUKBag()
 	ps := game.NewPubSub()
-	b := game.NewBoard(ps)
-	g := game.NewGame(tb, b, ps, 1)
+	board := game.NewBoard(ps)
+	g := game.NewGame(bag, board, ps, 1)
 	g.Start()
 	game.WaitKeyInput()
 }

@@ -15,6 +15,7 @@ func TestPickingTiles(t *testing.T) {
 		{1, tile.Tile{Letter: 'C', Score: 1}},
 	}
 	b := NewBag(tileCounts)
+	assert.True(t, b.TileCount() == 3)
 	for i := 0; i < 10; i++ {
 		pickTile(b, tiles, t)
 	}
@@ -22,6 +23,7 @@ func TestPickingTiles(t *testing.T) {
 
 func TestPickingUKTiles(t *testing.T) {
 	b := NewUKBag()
+	assert.True(t, b.TileCount() == 100)
 	for i := 0; i < 1000; i++ {
 		pickedTile := b.PickTile()
 		t.Log(fmt.Sprintf("Picked: %s", string(pickedTile.Letter)))

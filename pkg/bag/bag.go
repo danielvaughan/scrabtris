@@ -18,13 +18,20 @@ type TileCount struct {
 	tile   tile.Tile
 }
 
+func (b *Bag) TileCount() int {
+	if b == nil {
+		return 0
+	}
+	return len(b.tiles)
+}
+
 //PickTile returns a random tile from the bag.
 func (b *Bag) PickTile() tile.Tile {
 	pos := b.rng.Intn(len(b.tiles))
 	return b.tiles[pos]
 }
 
-//NewBag creates a bag containing a specified array of tiles.
+//NewBag creates a bag containing a specified set of tiles.
 func NewBag(tileCounts []TileCount) *Bag {
 	seed := time.Now().UTC().UnixNano()
 	tiles := make([]tile.Tile, 0)

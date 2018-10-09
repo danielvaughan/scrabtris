@@ -1,4 +1,4 @@
-package pub_sub
+package game
 
 type Event struct {
 	EventType string

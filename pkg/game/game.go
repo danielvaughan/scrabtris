@@ -1,35 +1,36 @@
 package game
 
 import (
-	"github.com/danielvaughan/scrabtris/pkg/game/board"
-	"github.com/danielvaughan/scrabtris/pkg/game/tile_bag"
-	"github.com/danielvaughan/scrabtris/pkg/pub_sub"
+	"github.com/danielvaughan/scrabtris/pkg/bag"
+	"github.com/danielvaughan/scrabtris/pkg/tile"
 	"time"
 )
 
 type Game struct {
-	tileBag *tile_bag.TileBag
-	board   *board.Board
-	pubSub  *pub_sub.PubSub
-	rate    int
+	clock  *Clock
+	bag    *bag.Bag
+	board  *Board
+	pubSub *PubSub
+	rate   int
 }
 
 func (g *Game) Start() {
 	g.pickTile()
 	for i := 0; i < 100; i++ {
 		time.Sleep(1 * time.Second)
-		g.pubSub.Pub(pub_sub.Event{EventType: "tick"})
+		g.pubSub.Pub(Event{EventType: "tick"})
 		g.tick()
 	}
 }
 
 func (g *Game) pickTile() {
-	tile := g.tileBag.PickTile()
+	tile := g.bag.PickTile()
 	g.onTilePicked(tile)
 }
 
-func (g *Game) onTilePicked(tile tile_bag.Tile) {
+func (g *Game) onTilePicked(tile tile.Tile) {
 	g.board.AddTile(tile)
+	RewriteScreen(g.board.State())
 }
 
 func (g *Game) tick() {
@@ -38,14 +39,18 @@ func (g *Game) tick() {
 
 func (g *Game) onTick() {
 	g.board.ProgressTile()
+	RewriteScreen(g.board.State())
 }
 
-func NewGame(tb *tile_bag.TileBag, b *board.Board, eb *pub_sub.PubSub, r int) *Game {
+func NewGame(bag *bag.Bag, board *Board, eb *PubSub, r int) *Game {
 	g := Game{
-		tileBag: tb,
-		board:   b,
-		pubSub:  eb,
-		rate:    r,
+		clock: NewClock(func() {
+
+		}),
+		bag:    bag,
+		board:  board,
+		pubSub: eb,
+		rate:   r,
 	}
 	return &g
 }
