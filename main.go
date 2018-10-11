@@ -4,6 +4,8 @@ import (
 	"github.com/danielvaughan/scrabtris/pkg/bag"
 	"github.com/danielvaughan/scrabtris/pkg/game"
 	"github.com/nsf/termbox-go"
+	"log"
+	"os"
 )
 
 func main() {
@@ -16,10 +18,10 @@ func main() {
 	termbox.SetInputMode(termbox.InputEsc)
 	termbox.Flush()
 
+	logger := log.New(os.Stdout, "scrabtris ", log.LstdFlags|log.Lshortfile)
 	bag := bag.NewUKBag()
-	ps := game.NewPubSub()
-	board := game.NewBoard(ps)
-	g := game.NewGame(bag, board, ps, 1)
+	board := game.NewBoard()
+	g := game.NewGame(logger, bag, board, 1)
 	g.Start()
 	game.WaitKeyInput()
 }
