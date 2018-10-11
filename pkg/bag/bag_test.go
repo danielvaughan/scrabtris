@@ -1,7 +1,8 @@
-package bag
+package bag_test
 
 import (
 	"fmt"
+	"github.com/danielvaughan/scrabtris/pkg/bag"
 	"github.com/danielvaughan/scrabtris/pkg/tile"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -9,12 +10,12 @@ import (
 
 func TestPickingTiles(t *testing.T) {
 	tiles := []tile.Tile{{'A', 1}, {'B', 1}, {'C', 1}}
-	tileCounts := []TileCount{
+	tileCounts := []bag.TileCount{
 		{1, tile.Tile{Letter: 'A', Score: 1}},
 		{1, tile.Tile{Letter: 'B', Score: 1}},
 		{1, tile.Tile{Letter: 'C', Score: 1}},
 	}
-	b := NewBag(tileCounts)
+	b := bag.NewBag(tileCounts)
 	assert.True(t, b.TileCount() == 3)
 	for i := 0; i < 10; i++ {
 		pickTile(b, tiles, t)
@@ -22,7 +23,7 @@ func TestPickingTiles(t *testing.T) {
 }
 
 func TestPickingUKTiles(t *testing.T) {
-	b := NewUKBag()
+	b := bag.NewUKBag()
 	assert.True(t, b.TileCount() == 100)
 	for i := 0; i < 1000; i++ {
 		pickedTile := b.PickTile()
@@ -34,7 +35,7 @@ func TestPickingUKTiles(t *testing.T) {
 	}
 }
 
-func pickTile(b *Bag, tiles []tile.Tile, t *testing.T) {
+func pickTile(b *bag.Bag, tiles []tile.Tile, t *testing.T) {
 	pickedTile := b.PickTile()
 	t.Log(fmt.Sprintf("Picked: %s", string(pickedTile.Letter)))
 	found := false
