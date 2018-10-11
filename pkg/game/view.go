@@ -5,6 +5,11 @@ import (
 	"strings"
 )
 
+type View struct {
+	Board *Board
+	Game  *Game
+}
+
 const (
 	background = `
 		WWWWWWWWWWWW WWWWWW
@@ -31,25 +36,30 @@ const (
 		kkkkkkkkkkkkkkkkkkk
 		WWWWWWWWWWWWWWWWWWW
 	`
-	boardXOffset, boardYOffset = 3, 2
+	boardXOffset, boardYOffset = 5, 2
 )
 
 var (
 	colorMapping = map[rune]termbox.Attribute{
 		'k': termbox.ColorBlack,
-		'K': termbox.ColorBlack | termbox.AttrBold,
+		'B': termbox.ColorBlue | termbox.AttrBold,
 		'W': termbox.ColorWhite | termbox.AttrBold,
 	}
 )
 
-func RewriteScreen(text string) {
+func (v *View) refreshScreen() {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
 	drawBacks(background, 0, 0)
-	drawCells(text, boardXOffset, boardYOffset)
+	drawCells(v.Board.State(), boardXOffset, boardYOffset)
+	drawNextTile(v.Game.nextTile.Letter)
 	drawTexts()
 
 	termbox.Flush()
+}
+
+func drawNextTile(letter rune) {
+	drawText(34, 3, string(letter), termbox.ColorBlack, termbox.ColorYellow)
 }
 
 func drawTexts() {
@@ -70,7 +80,11 @@ func drawCells(text string, left, top int) {
 
 	for y, line := range lines {
 		for x, char := range line {
-			drawText(left+x, top+y, string(char), termbox.ColorWhite, termbox.ColorDefault)
+			if char == ' ' {
+				drawText(left+2*x, top+y, string(char), termbox.ColorBlack, termbox.ColorBlack)
+			} else {
+				drawText(left+2*x, top+y, string(char), termbox.ColorBlack, termbox.ColorYellow)
+			}
 		}
 	}
 }
@@ -92,13 +106,4 @@ func drawBack(x, y int, color termbox.Attribute) {
 
 func colorByChar(ch rune) termbox.Attribute {
 	return colorMapping[ch]
-}
-
-func charByColor(color termbox.Attribute) rune {
-	for ch, currentColor := range colorMapping {
-		if currentColor == color {
-			return ch
-		}
-	}
-	return '.'
 }

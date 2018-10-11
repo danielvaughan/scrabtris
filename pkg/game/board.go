@@ -11,10 +11,10 @@ const (
 )
 
 type Board struct {
-	squares [boardWidth][boardHeight]tile.Tile
+	squares *[boardWidth][boardHeight]tile.Tile
 	tileRow int
 	tileCol int
-	Game    Game
+	Game    *Game
 }
 
 func (b *Board) State() string {
@@ -28,10 +28,10 @@ func (b *Board) State() string {
 	return text
 }
 
-func (b *Board) AddTile(tile tile.Tile) {
+func (b *Board) AddTile(t *tile.Tile) {
 	b.tileRow = 0
 	b.tileCol = boardWidth / 2
-	b.squares[b.tileCol][b.tileRow] = tile
+	b.squares[b.tileCol][b.tileRow] = *t
 }
 
 func (b *Board) ProgressTile() {
@@ -50,10 +50,12 @@ func NewBoard() *Board {
 		tileRow: -1,
 		tileCol: -1,
 	}
+	var squares [boardWidth][boardHeight]tile.Tile
 	for i := 0; i < boardWidth; i++ {
 		for j := 0; j < boardHeight; j++ {
-			board.squares[i][j] = tile.EmptyTile
+			squares[i][j] = tile.EmptyTile
 		}
 	}
+	board.squares = &squares
 	return board
 }

@@ -4,60 +4,51 @@ import (
 	"github.com/danielvaughan/scrabtris/pkg/bag"
 	"github.com/danielvaughan/scrabtris/pkg/tile"
 	"log"
-	"time"
 )
 
 //Game manages the game state
 type Game struct {
-	logger *log.Logger
-	clock  *Clock
-	bag    *bag.Bag
-	board  *Board
-	rate   int
+	logger   *log.Logger
+	clock    *Clock
+	bag      *bag.Bag
+	board    *Board
+	nextTile *tile.Tile
+	rate     int
 }
 
 //Start starts the game
 func (g *Game) Start() {
+	g.clock.start()
 	g.pickTile()
-	for i := 0; i < 100; i++ {
-		time.Sleep(1 * time.Second)
-		g.tick()
-	}
 }
 
 func (g *Game) pickTile() {
-	tile := g.bag.PickTile()
-	g.onTilePicked(tile)
-}
-
-func (g *Game) onTilePicked(tile tile.Tile) {
-	g.board.AddTile(tile)
-	RewriteScreen(g.board.State())
-}
-
-func (g *Game) tick() {
-	g.onTick()
-}
-
-func (g *Game) onTick() {
-	g.board.ProgressTile()
-	RewriteScreen(g.board.State())
+	if g.nextTile == &tile.EmptyTile {
+		g.nextTile = g.bag.PickTile()
+	}
+	g.board.AddTile(g.nextTile)
+	g.nextTile = g.bag.PickTile()
 }
 
 func (g *Game) onTileLanded(t tile.Tile) {
-	g.logger.Printf("Tile %s landed", string(t.Letter))
+	//work out words
+	g.pickTile()
 }
 
-func NewGame(logger *log.Logger, bag *bag.Bag, board *Board, r int) *Game {
+func NewGame(logger *log.Logger, bag *bag.Bag, board *Board, view *View, r int) *Game {
+	view.Board = board
 	g := Game{
 		logger: logger,
 		clock: NewClock(func() {
-
+			board.ProgressTile()
+			view.refreshScreen()
 		}),
-		bag:   bag,
-		board: board,
-		rate:  r,
+		bag:      bag,
+		board:    board,
+		nextTile: &tile.EmptyTile,
+		rate:     r,
 	}
-	board.Game = g
+	board.Game = &g
+	view.Game = &g
 	return &g
 }

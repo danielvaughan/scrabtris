@@ -14,8 +14,8 @@ type Bag struct {
 
 //TileCount specifies a number of tiles to add to a bag
 type TileCount struct {
-	number int
-	tile   tile.Tile
+	Number int
+	Tile   tile.Tile
 }
 
 func (b *Bag) TileCount() int {
@@ -26,9 +26,9 @@ func (b *Bag) TileCount() int {
 }
 
 //PickTile returns a random tile from the bag.
-func (b *Bag) PickTile() tile.Tile {
+func (b *Bag) PickTile() *tile.Tile {
 	pos := b.rng.Intn(len(b.tiles))
-	return b.tiles[pos]
+	return &b.tiles[pos]
 }
 
 //NewBag creates a bag containing a specified set of tiles.
@@ -36,8 +36,8 @@ func NewBag(tileCounts []TileCount) *Bag {
 	seed := time.Now().UTC().UnixNano()
 	tiles := make([]tile.Tile, 0)
 	for _, tc := range tileCounts {
-		for i := 0; i < tc.number; i++ {
-			tiles = append(tiles, tc.tile)
+		for i := 0; i < tc.Number; i++ {
+			tiles = append(tiles, tc.Tile)
 		}
 	}
 	t := Bag{
