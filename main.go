@@ -4,6 +4,7 @@ import (
 	"github.com/danielvaughan/scrabtris/pkg/bag"
 	"github.com/danielvaughan/scrabtris/pkg/board"
 	"github.com/danielvaughan/scrabtris/pkg/game"
+	"github.com/danielvaughan/scrabtris/pkg/tile"
 	"github.com/nsf/termbox-go"
 	"log"
 	"os"
@@ -22,9 +23,11 @@ func main() {
 
 	logger := log.New(os.Stdout, "scrabtris ", log.LstdFlags|log.Lshortfile)
 	bag := bag.NewUKBag()
-	board := board.NewBoard()
+	tileLanded := make(chan tile.Tile)
+	topReached := make(chan tile.Tile)
+	board := board.NewBoard(tileLanded)
 	view := &game.View{}
-	g := game.NewGame(logger, bag, board, view, 1)
+	g := game.NewGame(logger, bag, board, view, tileLanded, topReached, 1)
 	g.Start()
 	game.WaitKeyInput()
 }

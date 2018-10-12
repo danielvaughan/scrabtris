@@ -31,12 +31,7 @@ func (g *Game) pickTile() {
 	g.nextTile = g.bag.PickTile()
 }
 
-func (g *Game) onTileLanded(t tile.Tile) {
-	//work out words
-	g.pickTile()
-}
-
-func NewGame(logger *log.Logger, bag *bag.Bag, board *board.Board, view *View, r int) *Game {
+func NewGame(logger *log.Logger, bag *bag.Bag, board *board.Board, view *View, tileLanded chan tile.Tile, topReached chan tile.Tile, r int) *Game {
 	view.Board = board
 	g := Game{
 		logger: logger,
@@ -50,5 +45,15 @@ func NewGame(logger *log.Logger, bag *bag.Bag, board *board.Board, view *View, r
 		rate:     r,
 	}
 	view.Game = &g
+	go func(tileLanded chan tile.Tile) {
+		for {
+			select {
+			case <-tileLanded:
+				g.pickTile()
+			case <-topReached:
+				g.clock.gameover = true
+			}
+		}
+	}(tileLanded)
 	return &g
 }
