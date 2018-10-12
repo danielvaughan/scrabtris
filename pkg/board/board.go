@@ -54,6 +54,11 @@ func (b *Board) ProgressTile() {
 	nextRowIsLast := b.tileRow == height-2
 	nextRowIsTop := b.tileRow == 0
 	nextSquareHasTile := b.squares[b.tileCol][b.tileRow+1].Letter != tile.EmptyTile.Letter
+	if nextSquareHasTile && nextRowIsTop {
+		b.moveTileDown(t)
+		b.topReached <- t
+		return
+	}
 	if nextRowIsLast && !nextSquareHasTile {
 		b.moveTileDown(t)
 		b.landTile(t)
@@ -61,11 +66,6 @@ func (b *Board) ProgressTile() {
 	}
 	if nextSquareHasTile && !nextRowIsTop {
 		b.landTile(t)
-		return
-	}
-	if nextSquareHasTile && nextRowIsTop {
-		b.moveTileDown(t)
-		b.topReached <- t
 		return
 	}
 	b.moveTileDown(t)

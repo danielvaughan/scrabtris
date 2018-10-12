@@ -31,6 +31,10 @@ func (g *Game) pickTile() {
 	g.nextTile = g.bag.PickTile()
 }
 
+func (g *Game) gameOver() {
+	g.clock.over()
+}
+
 func NewGame(logger *log.Logger, bag *bag.Bag, board *board.Board, view *View, tileLanded chan tile.Tile, topReached chan tile.Tile, r int) *Game {
 	view.Board = board
 	g := Game{
@@ -51,7 +55,7 @@ func NewGame(logger *log.Logger, bag *bag.Bag, board *board.Board, view *View, t
 			case <-tileLanded:
 				g.pickTile()
 			case <-topReached:
-				g.clock.gameover = true
+				g.gameOver()
 			}
 		}
 	}(tileLanded)
