@@ -65,8 +65,8 @@ func drawNextTile(letter rune) {
 
 func drawTexts() {
 	drawText(32, 9, "SCORE", termbox.ColorWhite, termbox.ColorBlue)
-	drawText(3, 22, "  ←           <SPC>          →", termbox.ColorWhite, termbox.ColorBlack)
-	drawText(3, 23, " left         drop         right", termbox.ColorBlack, termbox.ColorWhite)
+	drawText(3, 22, " ←                            →", termbox.ColorWhite, termbox.ColorBlack)
+	drawText(3, 23, " left                     right", termbox.ColorBlack, termbox.ColorWhite)
 	drawText(30, 20, " q: quit", termbox.ColorWhite, termbox.ColorDefault)
 }
 

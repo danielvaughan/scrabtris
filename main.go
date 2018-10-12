@@ -29,5 +29,5 @@ func main() {
 	view := &game.View{}
 	g := game.NewGame(logger, bag, board, view, tileLanded, topReached, 1)
 	g.Start()
-	game.WaitKeyInput()
+	g.WaitKeyInput()
 }

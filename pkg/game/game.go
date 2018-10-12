@@ -1,9 +1,11 @@
 package game
 
 import (
+	"fmt"
 	"github.com/danielvaughan/scrabtris/pkg/bag"
 	"github.com/danielvaughan/scrabtris/pkg/board"
 	"github.com/danielvaughan/scrabtris/pkg/tile"
+	"github.com/nsf/termbox-go"
 	"log"
 )
 
@@ -13,6 +15,7 @@ type Game struct {
 	clock    *Clock
 	bag      *bag.Bag
 	board    *board.Board
+	view     *View
 	nextTile tile.Tile
 	rate     int
 }
@@ -35,6 +38,32 @@ func (g *Game) gameOver() {
 	g.clock.over()
 }
 
+func (g *Game) WaitKeyInput() {
+	for {
+		switch ev := termbox.PollEvent(); ev.Type {
+		case termbox.EventKey:
+			if ev.Ch == 'q' || ev.Key == termbox.KeyCtrlC || ev.Key == termbox.KeyCtrlD {
+				fmt.Println("quit")
+				return
+			} else {
+				if g.clock.lock {
+					continue
+				} else if g.clock.gameover {
+					if ev.Key == termbox.KeySpace {
+						g.Start()
+					}
+					continue
+				} else if ev.Key == termbox.KeyArrowLeft {
+					fmt.Println("left")
+				} else if ev.Key == termbox.KeyArrowRight {
+					fmt.Println("right")
+				}
+			}
+		}
+		g.view.refreshScreen()
+	}
+}
+
 func NewGame(logger *log.Logger, bag *bag.Bag, board *board.Board, view *View, tileLanded chan tile.Tile, topReached chan tile.Tile, r int) *Game {
 	view.Board = board
 	g := Game{
@@ -45,6 +74,7 @@ func NewGame(logger *log.Logger, bag *bag.Bag, board *board.Board, view *View, t
 		}),
 		bag:      bag,
 		board:    board,
+		view:     view,
 		nextTile: tile.EmptyTile,
 		rate:     r,
 	}
