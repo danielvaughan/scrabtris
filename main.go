@@ -3,11 +3,13 @@ package main
 import (
 	"github.com/danielvaughan/scrabtris/pkg/bag"
 	"github.com/danielvaughan/scrabtris/pkg/board"
+	"github.com/danielvaughan/scrabtris/pkg/dictionary"
 	"github.com/danielvaughan/scrabtris/pkg/game"
 	"github.com/danielvaughan/scrabtris/pkg/tile"
 	"github.com/nsf/termbox-go"
 	"log"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -22,12 +24,13 @@ func main() {
 	termbox.Flush()
 
 	logger := log.New(os.Stdout, "scrabtris ", log.LstdFlags|log.Lshortfile)
-	bag := bag.NewUKBag()
+	bg := bag.NewUKBag()
 	tileLanded := make(chan tile.Tile)
 	topReached := make(chan tile.Tile)
-	board := board.NewBoard(tileLanded)
+	bd := board.NewBoard(tileLanded)
+	dic := dictionary.NewDictionary(logger, strings.NewReader("cat\ndog\ndonkey\n"))
 	view := &game.View{}
-	g := game.NewGame(logger, bag, board, view, tileLanded, topReached, 1)
+	g := game.NewGame(logger, bg, dic, bd, view, tileLanded, topReached, 1)
 	g.Start()
 	g.WaitKeyInput()
 }

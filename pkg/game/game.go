@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/danielvaughan/scrabtris/pkg/bag"
 	"github.com/danielvaughan/scrabtris/pkg/board"
+	"github.com/danielvaughan/scrabtris/pkg/dictionary"
 	"github.com/danielvaughan/scrabtris/pkg/tile"
 	"github.com/nsf/termbox-go"
 	"log"
@@ -11,13 +12,14 @@ import (
 
 //Game manages the game state
 type Game struct {
-	logger   *log.Logger
-	clock    *Clock
-	bag      *bag.Bag
-	board    *board.Board
-	view     *View
-	nextTile tile.Tile
-	rate     int
+	logger     *log.Logger
+	clock      *Clock
+	bag        *bag.Bag
+	dictionary *dictionary.Dictionary
+	board      *board.Board
+	view       *View
+	nextTile   tile.Tile
+	rate       int
 }
 
 //Start starts the game
@@ -54,9 +56,9 @@ func (g *Game) WaitKeyInput() {
 					}
 					continue
 				} else if ev.Key == termbox.KeyArrowLeft {
-					fmt.Println("left")
+					g.left()
 				} else if ev.Key == termbox.KeyArrowRight {
-					fmt.Println("right")
+					g.right()
 				}
 			}
 		}
@@ -64,7 +66,28 @@ func (g *Game) WaitKeyInput() {
 	}
 }
 
-func NewGame(logger *log.Logger, bag *bag.Bag, board *board.Board, view *View, tileLanded chan tile.Tile, topReached chan tile.Tile, r int) *Game {
+func (g *Game) left() {
+	g.board.MoveTileLeft()
+}
+
+func (g *Game) right() {
+	g.board.MoveTileRight()
+}
+
+func (g *Game) checkBoard() {
+	/*for _, tt := range g.board.Rows(){
+		g.dictionary.FindWords(tt)
+	}*/
+}
+
+func NewGame(logger *log.Logger,
+	bag *bag.Bag,
+	dictionary *dictionary.Dictionary,
+	board *board.Board,
+	view *View,
+	tileLanded chan tile.Tile,
+	topReached chan tile.Tile,
+	r int) *Game {
 	view.Board = board
 	g := Game{
 		logger: logger,
@@ -72,17 +95,19 @@ func NewGame(logger *log.Logger, bag *bag.Bag, board *board.Board, view *View, t
 			board.ProgressTile()
 			view.refreshScreen()
 		}),
-		bag:      bag,
-		board:    board,
-		view:     view,
-		nextTile: tile.EmptyTile,
-		rate:     r,
+		bag:        bag,
+		dictionary: dictionary,
+		board:      board,
+		view:       view,
+		nextTile:   tile.EmptyTile,
+		rate:       r,
 	}
 	view.Game = &g
 	go func(tileLanded chan tile.Tile) {
 		for {
 			select {
 			case <-tileLanded:
+				g.checkBoard()
 				g.pickTile()
 			case <-topReached:
 				g.gameOver()

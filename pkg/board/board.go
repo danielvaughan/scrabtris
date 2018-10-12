@@ -12,7 +12,7 @@ const (
 
 //Board represents the current state of tiles on the board and the position of the active tile
 type Board struct {
-	squares    *[width][height]tile.Tile
+	squares    [width][height]tile.Tile
 	tileRow    int
 	tileCol    int
 	tileLanded chan tile.Tile
@@ -71,6 +71,36 @@ func (b *Board) ProgressTile() {
 	b.moveTileDown(t)
 }
 
+//MoveTileLeft moves the current tile to the left
+func (b *Board) MoveTileLeft() {
+	if b.tileCol > 0 {
+		nextSquareHasTile := b.squares[b.tileCol-1][b.tileRow].Letter != tile.EmptyTile.Letter
+		if !nextSquareHasTile {
+			t := b.squares[b.tileCol][b.tileRow]
+			b.squares[b.tileCol][b.tileRow] = tile.EmptyTile
+			b.tileCol--
+			b.squares[b.tileCol][b.tileRow] = t
+		}
+	}
+}
+
+//MoveTileRight moves the current tile to the right
+func (b *Board) MoveTileRight() {
+	if b.tileCol < width-1 {
+		nextSquareHasTile := b.squares[b.tileCol+1][b.tileRow].Letter != tile.EmptyTile.Letter
+		if !nextSquareHasTile {
+			t := b.squares[b.tileCol][b.tileRow]
+			b.squares[b.tileCol][b.tileRow] = tile.EmptyTile
+			b.tileCol++
+			b.squares[b.tileCol][b.tileRow] = t
+		}
+	}
+}
+
+func (b *Board) Row() []tile.Tile {
+	return nil // b.squares[height]
+}
+
 //NewBoard creates a board full of empty tiles
 func NewBoard(tileLanded chan tile.Tile) *Board {
 	board := &Board{
@@ -84,7 +114,7 @@ func NewBoard(tileLanded chan tile.Tile) *Board {
 			squares[i][j] = tile.EmptyTile
 		}
 	}
-	board.squares = &squares
+	board.squares = squares
 	board.tileLanded = tileLanded
 	return board
 }
