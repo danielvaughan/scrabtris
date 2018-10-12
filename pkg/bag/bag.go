@@ -26,9 +26,9 @@ func (b *Bag) TileCount() int {
 }
 
 //PickTile returns a random tile from the bag.
-func (b *Bag) PickTile() *tile.Tile {
+func (b *Bag) PickTile() tile.Tile {
 	pos := b.rng.Intn(len(b.tiles))
-	return &b.tiles[pos]
+	return b.tiles[pos]
 }
 
 //NewBag creates a bag containing a specified set of tiles.

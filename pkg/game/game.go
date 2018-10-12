@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/danielvaughan/scrabtris/pkg/bag"
+	"github.com/danielvaughan/scrabtris/pkg/board"
 	"github.com/danielvaughan/scrabtris/pkg/tile"
 	"log"
 )
@@ -11,8 +12,8 @@ type Game struct {
 	logger   *log.Logger
 	clock    *Clock
 	bag      *bag.Bag
-	board    *Board
-	nextTile *tile.Tile
+	board    *board.Board
+	nextTile tile.Tile
 	rate     int
 }
 
@@ -23,7 +24,7 @@ func (g *Game) Start() {
 }
 
 func (g *Game) pickTile() {
-	if g.nextTile == &tile.EmptyTile {
+	if g.nextTile == tile.EmptyTile {
 		g.nextTile = g.bag.PickTile()
 	}
 	g.board.AddTile(g.nextTile)
@@ -35,7 +36,7 @@ func (g *Game) onTileLanded(t tile.Tile) {
 	g.pickTile()
 }
 
-func NewGame(logger *log.Logger, bag *bag.Bag, board *Board, view *View, r int) *Game {
+func NewGame(logger *log.Logger, bag *bag.Bag, board *board.Board, view *View, r int) *Game {
 	view.Board = board
 	g := Game{
 		logger: logger,
@@ -45,10 +46,9 @@ func NewGame(logger *log.Logger, bag *bag.Bag, board *Board, view *View, r int) 
 		}),
 		bag:      bag,
 		board:    board,
-		nextTile: &tile.EmptyTile,
+		nextTile: tile.EmptyTile,
 		rate:     r,
 	}
-	board.Game = &g
 	view.Game = &g
 	return &g
 }

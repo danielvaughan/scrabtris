@@ -1,12 +1,13 @@
 package game
 
 import (
+	"github.com/danielvaughan/scrabtris/pkg/board"
 	"github.com/nsf/termbox-go"
 	"strings"
 )
 
 type View struct {
-	Board *Board
+	Board *board.Board
 	Game  *Game
 }
 

@@ -1,4 +1,4 @@
-package game
+package board
 
 import (
 	"fmt"
@@ -15,7 +15,6 @@ type Board struct {
 	squares *[boardWidth][boardHeight]tile.Tile
 	tileRow int
 	tileCol int
-	Game    *Game
 }
 
 //State returns the current state of the board as text.
@@ -31,10 +30,10 @@ func (b *Board) State() string {
 }
 
 //AddTile adds a tile to the top row of the board in the middle column
-func (b *Board) AddTile(t *tile.Tile) {
+func (b *Board) AddTile(t tile.Tile) {
 	b.tileRow = 0
 	b.tileCol = boardWidth / 2
-	b.squares[b.tileCol][b.tileRow] = *t
+	b.squares[b.tileCol][b.tileRow] = t
 }
 
 //ProgressTile progresses the in play tile down one row or lands the title if it can go no further
@@ -44,7 +43,7 @@ func (b *Board) ProgressTile() {
 	if b.tileRow != boardHeight-1 && b.squares[b.tileCol][b.tileRow+1].Letter == tile.EmptyTile.Letter {
 		b.tileRow++
 	} else {
-		b.Game.onTileLanded(t)
+		//b.Game.OnTileLanded(t)
 	}
 	b.squares[b.tileCol][b.tileRow] = t
 }

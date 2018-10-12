@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/danielvaughan/scrabtris/pkg/bag"
+	"github.com/danielvaughan/scrabtris/pkg/board"
 	"github.com/danielvaughan/scrabtris/pkg/game"
 	"github.com/nsf/termbox-go"
 	"log"
@@ -21,7 +22,7 @@ func main() {
 
 	logger := log.New(os.Stdout, "scrabtris ", log.LstdFlags|log.Lshortfile)
 	bag := bag.NewUKBag()
-	board := game.NewBoard()
+	board := board.NewBoard()
 	view := &game.View{}
 	g := game.NewGame(logger, bag, board, view, 1)
 	g.Start()
