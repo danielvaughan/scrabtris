@@ -1,14 +1,21 @@
-package game
+package view
 
 import (
-	"github.com/danielvaughan/scrabtris/pkg/board"
+	"github.com/danielvaughan/scrabtris/pkg/tile"
 	"github.com/nsf/termbox-go"
 	"strings"
 )
 
 type View struct {
-	Board *board.Board
-	Game  *Game
+	nextTilePicked chan tile.Tile
+}
+
+func NewView(nextTilePicked chan tile.Tile) *View {
+	v := View{
+		nextTilePicked: nextTilePicked,
+	}
+	v.handleEvents(nextTilePicked)
+	return &v
 }
 
 const (
@@ -48,15 +55,26 @@ var (
 	}
 )
 
-func (v *View) refreshScreen() {
+func (v *View) RefreshScreen(boardState string) {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
 	drawBacks(background, 0, 0)
-	drawCells(v.Board.State(), boardXOffset, boardYOffset)
-	drawNextTile(v.Game.nextTile.Letter)
+	drawCells(boardState, boardXOffset, boardYOffset)
+
 	drawTexts()
 
 	termbox.Flush()
+}
+
+func (v *View) handleEvents(nextTilePicked chan tile.Tile) {
+	go func() {
+		for {
+			select {
+			case t := <-nextTilePicked:
+				drawNextTile(t.Letter)
+			}
+		}
+	}()
 }
 
 func drawNextTile(letter rune) {

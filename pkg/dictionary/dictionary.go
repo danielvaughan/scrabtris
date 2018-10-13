@@ -49,7 +49,6 @@ func NewDictionary(logger *log.Logger, wordList io.Reader) *Dictionary {
 		if b == '\n' {
 			word = strings.ToUpper(string(word))
 			words = append(words, word)
-			logger.Printf("added %s", word)
 			word = ""
 		} else {
 			word = fmt.Sprint(word, string(b))

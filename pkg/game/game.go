@@ -6,33 +6,39 @@ import (
 	"github.com/danielvaughan/scrabtris/pkg/board"
 	"github.com/danielvaughan/scrabtris/pkg/dictionary"
 	"github.com/danielvaughan/scrabtris/pkg/tile"
+	"github.com/danielvaughan/scrabtris/pkg/view"
 	"github.com/nsf/termbox-go"
 	"log"
 )
 
 //Game manages the game state
 type Game struct {
-	logger     *log.Logger
-	clock      *Clock
-	bag        *bag.Bag
-	dictionary *dictionary.Dictionary
-	board      *board.Board
-	view       *View
-	nextTile   tile.Tile
-	rate       int
+	logger         *log.Logger
+	clock          *Clock
+	bag            *bag.Bag
+	dictionary     *dictionary.Dictionary
+	board          *board.Board
+	view           *view.View
+	nextTile       tile.Tile
+	tilePicked     chan tile.Tile
+	nextTilePicked chan tile.Tile
+	tileMoved      chan rune
+	rate           int
 }
 
 //Start starts the game
 func (g *Game) Start() {
 	g.clock.start()
 	g.pickTile()
+	g.waitKeyInput()
 }
 
 func (g *Game) pickTile() {
 	if g.nextTile == tile.EmptyTile {
 		g.nextTile = g.bag.PickTile()
+		g.nextTilePicked <- g.nextTile
 	}
-	g.board.AddTile(g.nextTile)
+	g.tilePicked <- g.nextTile
 	g.nextTile = g.bag.PickTile()
 }
 
@@ -40,7 +46,7 @@ func (g *Game) gameOver() {
 	g.clock.over()
 }
 
-func (g *Game) WaitKeyInput() {
+func (g *Game) waitKeyInput() {
 	for {
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
@@ -56,22 +62,14 @@ func (g *Game) WaitKeyInput() {
 					}
 					continue
 				} else if ev.Key == termbox.KeyArrowLeft {
-					g.left()
+					g.tileMoved <- 'l'
 				} else if ev.Key == termbox.KeyArrowRight {
-					g.right()
+					g.tileMoved <- 'r'
 				}
 			}
 		}
-		g.view.refreshScreen()
+		g.view.RefreshScreen(g.board.State())
 	}
-}
-
-func (g *Game) left() {
-	g.board.MoveTileLeft()
-}
-
-func (g *Game) right() {
-	g.board.MoveTileRight()
 }
 
 func (g *Game) checkBoard() {
@@ -84,26 +82,36 @@ func NewGame(logger *log.Logger,
 	bag *bag.Bag,
 	dictionary *dictionary.Dictionary,
 	board *board.Board,
-	view *View,
+	view *view.View,
 	tileLanded chan tile.Tile,
 	topReached chan tile.Tile,
+	tilePicked chan tile.Tile,
+	nextTilePicked chan tile.Tile,
+	tileMoved chan rune,
+	clockTicked chan int,
 	r int) *Game {
-	view.Board = board
 	g := Game{
 		logger: logger,
 		clock: NewClock(func() {
-			board.ProgressTile()
-			view.refreshScreen()
+			clockTicked <- 0
+			view.RefreshScreen(board.State())
 		}),
-		bag:        bag,
-		dictionary: dictionary,
-		board:      board,
-		view:       view,
-		nextTile:   tile.EmptyTile,
-		rate:       r,
+		bag:            bag,
+		dictionary:     dictionary,
+		board:          board,
+		view:           view,
+		nextTile:       tile.EmptyTile,
+		tilePicked:     tilePicked,
+		nextTilePicked: nextTilePicked,
+		tileMoved:      tileMoved,
+		rate:           r,
 	}
-	view.Game = &g
-	go func(tileLanded chan tile.Tile) {
+	g.handleEvents(topReached, tileLanded)
+	return &g
+}
+
+func (g *Game) handleEvents(topReached chan tile.Tile, tileLanded chan tile.Tile) {
+	go func() {
 		for {
 			select {
 			case <-tileLanded:
@@ -113,6 +121,5 @@ func NewGame(logger *log.Logger,
 				g.gameOver()
 			}
 		}
-	}(tileLanded)
-	return &g
+	}()
 }

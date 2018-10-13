@@ -12,11 +12,14 @@ const (
 
 //Board represents the current state of tiles on the board and the position of the active tile
 type Board struct {
-	squares    [width][height]tile.Tile
-	tileRow    int
-	tileCol    int
-	tileLanded chan tile.Tile
-	topReached chan tile.Tile
+	squares     [width][height]tile.Tile
+	tileRow     int
+	tileCol     int
+	tileLanded  chan tile.Tile
+	topReached  chan tile.Tile
+	tilePicked  chan tile.Tile
+	tileMoved   chan rune
+	clockTicked chan int
 }
 
 //State returns the current state of the board as text.
@@ -31,8 +34,7 @@ func (b *Board) State() string {
 	return text
 }
 
-//AddTile adds a tile to the top row of the board in the middle column
-func (b *Board) AddTile(t tile.Tile) {
+func (b *Board) onTilePicked(t tile.Tile) {
 	b.squares[b.tileCol][b.tileRow] = t
 }
 
@@ -49,7 +51,7 @@ func (b *Board) landTile(t tile.Tile) {
 }
 
 //ProgressTile progresses the in play tile down one row or lands the title if it can go no further
-func (b *Board) ProgressTile() {
+func (b *Board) onClockTicked() {
 	t := b.squares[b.tileCol][b.tileRow]
 	nextRowIsLast := b.tileRow == height-2
 	nextRowIsTop := b.tileRow == 0
@@ -71,28 +73,27 @@ func (b *Board) ProgressTile() {
 	b.moveTileDown(t)
 }
 
-//MoveTileLeft moves the current tile to the left
-func (b *Board) MoveTileLeft() {
-	if b.tileCol > 0 {
-		nextSquareHasTile := b.squares[b.tileCol-1][b.tileRow].Letter != tile.EmptyTile.Letter
-		if !nextSquareHasTile {
-			t := b.squares[b.tileCol][b.tileRow]
-			b.squares[b.tileCol][b.tileRow] = tile.EmptyTile
-			b.tileCol--
-			b.squares[b.tileCol][b.tileRow] = t
+func (b *Board) onTileMoved(direction rune) {
+	if direction == 'r' {
+		if b.tileCol < width-1 {
+			nextSquareHasTile := b.squares[b.tileCol+1][b.tileRow].Letter != tile.EmptyTile.Letter
+			if !nextSquareHasTile {
+				t := b.squares[b.tileCol][b.tileRow]
+				b.squares[b.tileCol][b.tileRow] = tile.EmptyTile
+				b.tileCol++
+				b.squares[b.tileCol][b.tileRow] = t
+			}
 		}
 	}
-}
-
-//MoveTileRight moves the current tile to the right
-func (b *Board) MoveTileRight() {
-	if b.tileCol < width-1 {
-		nextSquareHasTile := b.squares[b.tileCol+1][b.tileRow].Letter != tile.EmptyTile.Letter
-		if !nextSquareHasTile {
-			t := b.squares[b.tileCol][b.tileRow]
-			b.squares[b.tileCol][b.tileRow] = tile.EmptyTile
-			b.tileCol++
-			b.squares[b.tileCol][b.tileRow] = t
+	if direction == 'l' {
+		if b.tileCol > 0 {
+			nextSquareHasTile := b.squares[b.tileCol-1][b.tileRow].Letter != tile.EmptyTile.Letter
+			if !nextSquareHasTile {
+				t := b.squares[b.tileCol][b.tileRow]
+				b.squares[b.tileCol][b.tileRow] = tile.EmptyTile
+				b.tileCol--
+				b.squares[b.tileCol][b.tileRow] = t
+			}
 		}
 	}
 }
@@ -101,20 +102,47 @@ func (b *Board) Row() []tile.Tile {
 	return nil // b.squares[height]
 }
 
+func (b *Board) handleEvents(tilePicked chan tile.Tile, tileMoved chan rune, clockTicked chan int) {
+	go func() {
+		for {
+			select {
+			case t := <-tilePicked:
+				b.onTilePicked(t)
+			case d := <-tileMoved:
+				b.onTileMoved(d)
+			case <-clockTicked:
+				b.onClockTicked()
+			}
+		}
+	}()
+}
+
 //NewBoard creates a board full of empty tiles
-func NewBoard(tileLanded chan tile.Tile) *Board {
-	board := &Board{
-		tileRow:    0,
-		tileCol:    width / 2,
-		tileLanded: tileLanded,
+func NewBoard(tileLanded chan tile.Tile,
+	topReached chan tile.Tile,
+	tilePicked chan tile.Tile,
+	tileMoved chan rune,
+	clockTicked chan int) *Board {
+	b := &Board{
+		tileRow:     0,
+		tileCol:     width / 2,
+		tileLanded:  tileLanded,
+		topReached:  topReached,
+		tilePicked:  tilePicked,
+		tileMoved:   tileMoved,
+		clockTicked: clockTicked,
+		squares:     initBoard(),
 	}
+	b.handleEvents(tilePicked, tileMoved, clockTicked)
+	return b
+}
+
+func initBoard() [10][18]tile.Tile {
 	var squares [width][height]tile.Tile
 	for i := 0; i < width; i++ {
 		for j := 0; j < height; j++ {
 			squares[i][j] = tile.EmptyTile
 		}
 	}
-	board.squares = squares
-	board.tileLanded = tileLanded
-	return board
+	return squares
 }
