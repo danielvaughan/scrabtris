@@ -3,7 +3,6 @@ package game
 import (
 	"fmt"
 	"github.com/danielvaughan/scrabtris/pkg/bag"
-	"github.com/danielvaughan/scrabtris/pkg/board"
 	"github.com/danielvaughan/scrabtris/pkg/dictionary"
 	"github.com/danielvaughan/scrabtris/pkg/tile"
 	"github.com/danielvaughan/scrabtris/pkg/view"
@@ -13,17 +12,17 @@ import (
 
 //Game manages the game state
 type Game struct {
-	logger         *log.Logger
-	clock          *Clock
-	bag            *bag.Bag
-	dictionary     *dictionary.Dictionary
-	board          *board.Board
-	view           *view.View
-	nextTile       tile.Tile
-	tilePicked     chan tile.Tile
-	nextTilePicked chan tile.Tile
-	tileMoved      chan rune
-	rate           int
+	logger           *log.Logger
+	clock            *Clock
+	bag              *bag.Bag
+	dictionary       *dictionary.Dictionary
+	view             *view.View
+	nextTile         tile.Tile
+	tilePicked       chan tile.Tile
+	nextTilePicked   chan tile.Tile
+	tileMoved        chan rune
+	refreshRequested chan string
+	rate             int
 }
 
 //Start starts the game
@@ -68,7 +67,8 @@ func (g *Game) waitKeyInput() {
 				}
 			}
 		}
-		g.view.RefreshScreen(g.board.State())
+		//g.refreshRequested <- g.board.State()
+		//g.view.RefreshScreen(g.board.State())
 	}
 }
 
@@ -81,30 +81,29 @@ func (g *Game) checkBoard() {
 func NewGame(logger *log.Logger,
 	bag *bag.Bag,
 	dictionary *dictionary.Dictionary,
-	board *board.Board,
 	view *view.View,
 	tileLanded chan tile.Tile,
 	topReached chan tile.Tile,
 	tilePicked chan tile.Tile,
 	nextTilePicked chan tile.Tile,
 	tileMoved chan rune,
+	refreshRequested chan string,
 	clockTicked chan int,
 	r int) *Game {
 	g := Game{
 		logger: logger,
 		clock: NewClock(func() {
 			clockTicked <- 0
-			view.RefreshScreen(board.State())
 		}),
-		bag:            bag,
-		dictionary:     dictionary,
-		board:          board,
-		view:           view,
-		nextTile:       tile.EmptyTile,
-		tilePicked:     tilePicked,
-		nextTilePicked: nextTilePicked,
-		tileMoved:      tileMoved,
-		rate:           r,
+		bag:              bag,
+		dictionary:       dictionary,
+		view:             view,
+		nextTile:         tile.EmptyTile,
+		tilePicked:       tilePicked,
+		nextTilePicked:   nextTilePicked,
+		tileMoved:        tileMoved,
+		refreshRequested: refreshRequested,
+		rate:             r,
 	}
 	g.handleEvents(topReached, tileLanded)
 	return &g

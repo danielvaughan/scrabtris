@@ -10,11 +10,11 @@ type View struct {
 	nextTilePicked chan tile.Tile
 }
 
-func NewView(nextTilePicked chan tile.Tile) *View {
+func NewView(nextTilePicked chan tile.Tile, refreshRequested chan string) *View {
 	v := View{
 		nextTilePicked: nextTilePicked,
 	}
-	v.handleEvents(nextTilePicked)
+	v.handleEvents(nextTilePicked, refreshRequested)
 	return &v
 }
 
@@ -55,7 +55,7 @@ var (
 	}
 )
 
-func (v *View) RefreshScreen(boardState string) {
+func (v *View) onRefreshRequested(boardState string) {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
 	drawBacks(background, 0, 0)
@@ -66,12 +66,14 @@ func (v *View) RefreshScreen(boardState string) {
 	termbox.Flush()
 }
 
-func (v *View) handleEvents(nextTilePicked chan tile.Tile) {
+func (v *View) handleEvents(nextTilePicked chan tile.Tile, refreshRequested chan string) {
 	go func() {
 		for {
 			select {
 			case t := <-nextTilePicked:
 				drawNextTile(t.Letter)
+			case s := <-refreshRequested:
+				v.onRefreshRequested(s)
 			}
 		}
 	}()

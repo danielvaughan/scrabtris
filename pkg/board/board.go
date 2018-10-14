@@ -12,18 +12,19 @@ const (
 
 //Board represents the current state of tiles on the board and the position of the active tile
 type Board struct {
-	squares     [width][height]tile.Tile
-	tileRow     int
-	tileCol     int
-	tileLanded  chan tile.Tile
-	topReached  chan tile.Tile
-	tilePicked  chan tile.Tile
-	tileMoved   chan rune
-	clockTicked chan int
+	squares          [width][height]tile.Tile
+	tileRow          int
+	tileCol          int
+	tileLanded       chan tile.Tile
+	topReached       chan tile.Tile
+	tilePicked       chan tile.Tile
+	tileMoved        chan rune
+	refreshRequested chan string
+	clockTicked      chan int
 }
 
 //State returns the current state of the board as text.
-func (b *Board) State() string {
+func (b *Board) state() string {
 	text := ""
 	for j := 0; j < height; j++ {
 		for i := 0; i < width; i++ {
@@ -36,12 +37,14 @@ func (b *Board) State() string {
 
 func (b *Board) onTilePicked(t tile.Tile) {
 	b.squares[b.tileCol][b.tileRow] = t
+	b.refreshRequested <- b.state()
 }
 
 func (b *Board) moveTileDown(t tile.Tile) {
 	b.squares[b.tileCol][b.tileRow] = tile.EmptyTile
 	b.tileRow++
 	b.squares[b.tileCol][b.tileRow] = t
+	b.refreshRequested <- b.state()
 }
 
 func (b *Board) landTile(t tile.Tile) {
@@ -96,6 +99,7 @@ func (b *Board) onTileMoved(direction rune) {
 			}
 		}
 	}
+	b.refreshRequested <- b.state()
 }
 
 func (b *Board) Row() []tile.Tile {
@@ -122,16 +126,18 @@ func NewBoard(tileLanded chan tile.Tile,
 	topReached chan tile.Tile,
 	tilePicked chan tile.Tile,
 	tileMoved chan rune,
+	refreshRequested chan string,
 	clockTicked chan int) *Board {
 	b := &Board{
-		tileRow:     0,
-		tileCol:     width / 2,
-		tileLanded:  tileLanded,
-		topReached:  topReached,
-		tilePicked:  tilePicked,
-		tileMoved:   tileMoved,
-		clockTicked: clockTicked,
-		squares:     initBoard(),
+		tileRow:          0,
+		tileCol:          width / 2,
+		tileLanded:       tileLanded,
+		topReached:       topReached,
+		tilePicked:       tilePicked,
+		tileMoved:        tileMoved,
+		refreshRequested: refreshRequested,
+		clockTicked:      clockTicked,
+		squares:          initBoard(),
 	}
 	b.handleEvents(tilePicked, tileMoved, clockTicked)
 	return b

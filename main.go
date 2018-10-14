@@ -32,12 +32,13 @@ func main() {
 	tilePicked := make(chan tile.Tile)
 	nextTilePicked := make(chan tile.Tile)
 	tileMoved := make(chan rune)
+	refreshRequested := make(chan string)
 	clockTicked := make(chan int)
 
-	bd := board.NewBoard(tileLanded, topReached, tilePicked, tileMoved, clockTicked)
+	board.NewBoard(tileLanded, topReached, tilePicked, tileMoved, refreshRequested, clockTicked)
 
 	dic := dictionary.NewDictionary(logger, strings.NewReader("cat\ndog\ndonkey\n"))
-	v := view.NewView(nextTilePicked)
-	g := game.NewGame(logger, bg, dic, bd, v, tileLanded, topReached, tilePicked, nextTilePicked, tileMoved, clockTicked, 1)
+	v := view.NewView(nextTilePicked, refreshRequested)
+	g := game.NewGame(logger, bg, dic, v, tileLanded, topReached, tilePicked, nextTilePicked, tileMoved, refreshRequested, clockTicked, 1)
 	g.Start()
 }
