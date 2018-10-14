@@ -13,20 +13,20 @@ type Bag struct {
 	rng        *rand.Rand
 }
 
-//TileCount specifies a number of tiles to add to a bag
-type TileCount struct {
-	Number int
-	Tile   tile.Tile
+//tileCount specifies a number of tiles to add to a bag
+type tileCount struct {
+	number int
+	tile   tile.Tile
 }
 
-func (b *Bag) TileCount() int {
+func (b *Bag) tileCount() int {
 	if b == nil {
 		return 0
 	}
 	return len(b.tiles)
 }
 
-//PickTile returns a random tile from the bag.
+//onTileRequested returns a random tile from the bag.
 func (b *Bag) onTileRequested() {
 	pos := b.rng.Intn(len(b.tiles))
 	b.tilePicked <- b.tiles[pos]
@@ -44,12 +44,12 @@ func (b *Bag) handleEvents(tileRequested chan bool) {
 }
 
 //NewBag creates a bag containing a specified set of tiles.
-func NewBag(tileCounts []TileCount, tileRequested chan bool, tilePicked chan tile.Tile) *Bag {
+func NewBag(tileCounts []tileCount, tileRequested chan bool, tilePicked chan tile.Tile) *Bag {
 	seed := time.Now().UTC().UnixNano()
 	tiles := make([]tile.Tile, 0)
 	for _, tc := range tileCounts {
-		for i := 0; i < tc.Number; i++ {
-			tiles = append(tiles, tc.Tile)
+		for i := 0; i < tc.number; i++ {
+			tiles = append(tiles, tc.tile)
 		}
 	}
 	b := Bag{
@@ -63,7 +63,7 @@ func NewBag(tileCounts []TileCount, tileRequested chan bool, tilePicked chan til
 
 //NewUKBag create a bag containing the UK distribution of tiles.
 func NewUKBag(tileRequested chan bool, tilePicked chan tile.Tile) *Bag {
-	tileCounts := []TileCount{
+	tileCounts := []tileCount{
 		{9, tile.Tile{Letter: 'A', Score: 1}},
 		{2, tile.Tile{Letter: 'B', Score: 3}},
 		{2, tile.Tile{Letter: 'C', Score: 3}},

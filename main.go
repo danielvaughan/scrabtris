@@ -13,6 +13,17 @@ import (
 	"strings"
 )
 
+var (
+	tileRequested    = make(chan bool)
+	tilePicked       = make(chan tile.Tile)
+	tileLanded       = make(chan tile.Tile)
+	topReached       = make(chan tile.Tile)
+	nextTilePicked   = make(chan tile.Tile)
+	tileMoved        = make(chan rune)
+	refreshRequested = make(chan string)
+	clockTicked      = make(chan int)
+)
+
 func main() {
 
 	err := termbox.Init()
@@ -25,15 +36,6 @@ func main() {
 	termbox.Flush()
 
 	logger := log.New(os.Stdout, "scrabtris ", log.LstdFlags|log.Lshortfile)
-
-	tileRequested := make(chan bool)
-	tileLanded := make(chan tile.Tile)
-	topReached := make(chan tile.Tile)
-	tilePicked := make(chan tile.Tile)
-	nextTilePicked := make(chan tile.Tile)
-	tileMoved := make(chan rune)
-	refreshRequested := make(chan string)
-	clockTicked := make(chan int)
 
 	bag.NewUKBag(tileRequested, tilePicked)
 	board.NewBoard(tileLanded, topReached, tilePicked, tileMoved, refreshRequested, clockTicked)
