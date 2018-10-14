@@ -2,10 +2,7 @@ package game
 
 import (
 	"fmt"
-	"github.com/danielvaughan/scrabtris/pkg/bag"
-	"github.com/danielvaughan/scrabtris/pkg/dictionary"
 	"github.com/danielvaughan/scrabtris/pkg/tile"
-	"github.com/danielvaughan/scrabtris/pkg/view"
 	"github.com/nsf/termbox-go"
 	"log"
 )
@@ -14,10 +11,7 @@ import (
 type Game struct {
 	logger           *log.Logger
 	clock            *Clock
-	bag              *bag.Bag
-	dictionary       *dictionary.Dictionary
-	view             *view.View
-	nextTile         tile.Tile
+	tileRequested    chan bool
 	tilePicked       chan tile.Tile
 	nextTilePicked   chan tile.Tile
 	tileMoved        chan rune
@@ -28,17 +22,8 @@ type Game struct {
 //Start starts the game
 func (g *Game) Start() {
 	g.clock.start()
-	g.pickTile()
+	g.tileRequested <- true
 	g.waitKeyInput()
-}
-
-func (g *Game) pickTile() {
-	if g.nextTile == tile.EmptyTile {
-		g.nextTile = g.bag.PickTile()
-		g.nextTilePicked <- g.nextTile
-	}
-	g.tilePicked <- g.nextTile
-	g.nextTile = g.bag.PickTile()
 }
 
 func (g *Game) gameOver() {
@@ -67,8 +52,6 @@ func (g *Game) waitKeyInput() {
 				}
 			}
 		}
-		//g.refreshRequested <- g.board.State()
-		//g.view.RefreshScreen(g.board.State())
 	}
 }
 
@@ -79,9 +62,7 @@ func (g *Game) checkBoard() {
 }
 
 func NewGame(logger *log.Logger,
-	bag *bag.Bag,
-	dictionary *dictionary.Dictionary,
-	view *view.View,
+	tileRequested chan bool,
 	tileLanded chan tile.Tile,
 	topReached chan tile.Tile,
 	tilePicked chan tile.Tile,
@@ -95,10 +76,7 @@ func NewGame(logger *log.Logger,
 		clock: NewClock(func() {
 			clockTicked <- 0
 		}),
-		bag:              bag,
-		dictionary:       dictionary,
-		view:             view,
-		nextTile:         tile.EmptyTile,
+		tileRequested:    tileRequested,
 		tilePicked:       tilePicked,
 		nextTilePicked:   nextTilePicked,
 		tileMoved:        tileMoved,
@@ -115,7 +93,7 @@ func (g *Game) handleEvents(topReached chan tile.Tile, tileLanded chan tile.Tile
 			select {
 			case <-tileLanded:
 				g.checkBoard()
-				g.pickTile()
+				g.tileRequested <- true
 			case <-topReached:
 				g.gameOver()
 			}

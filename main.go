@@ -25,8 +25,8 @@ func main() {
 	termbox.Flush()
 
 	logger := log.New(os.Stdout, "scrabtris ", log.LstdFlags|log.Lshortfile)
-	bg := bag.NewUKBag()
 
+	tileRequested := make(chan bool)
 	tileLanded := make(chan tile.Tile)
 	topReached := make(chan tile.Tile)
 	tilePicked := make(chan tile.Tile)
@@ -35,10 +35,11 @@ func main() {
 	refreshRequested := make(chan string)
 	clockTicked := make(chan int)
 
+	bag.NewUKBag(tileRequested, tilePicked)
 	board.NewBoard(tileLanded, topReached, tilePicked, tileMoved, refreshRequested, clockTicked)
+	view.NewView(nextTilePicked, refreshRequested)
+	dictionary.NewDictionary(logger, strings.NewReader("cat\ndog\ndonkey\n"))
 
-	dic := dictionary.NewDictionary(logger, strings.NewReader("cat\ndog\ndonkey\n"))
-	v := view.NewView(nextTilePicked, refreshRequested)
-	g := game.NewGame(logger, bg, dic, v, tileLanded, topReached, tilePicked, nextTilePicked, tileMoved, refreshRequested, clockTicked, 1)
+	g := game.NewGame(logger, tileRequested, tileLanded, topReached, tilePicked, nextTilePicked, tileMoved, refreshRequested, clockTicked, 1)
 	g.Start()
 }

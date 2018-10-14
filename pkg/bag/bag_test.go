@@ -1,4 +1,4 @@
-package bag_test
+package bag
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ func TestPickingUKTiles(t *testing.T) {
 	b := bag.NewUKBag()
 	assert.True(t, b.TileCount() == 100)
 	for i := 0; i < 1000; i++ {
-		pickedTile := b.PickTile()
+		pickedTile := onTile()
 		t.Log(fmt.Sprintf("Picked: %s", string(pickedTile.Letter)))
 		if pickedTile.Letter != '_' {
 			assert.True(t, pickedTile.Score > 0)

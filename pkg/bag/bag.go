@@ -8,8 +8,9 @@ import (
 
 //Bag holds tiles to randomly pick from.
 type Bag struct {
-	tiles []tile.Tile
-	rng   *rand.Rand
+	tiles      []tile.Tile
+	tilePicked chan tile.Tile
+	rng        *rand.Rand
 }
 
 //TileCount specifies a number of tiles to add to a bag
@@ -26,13 +27,24 @@ func (b *Bag) TileCount() int {
 }
 
 //PickTile returns a random tile from the bag.
-func (b *Bag) PickTile() tile.Tile {
+func (b *Bag) onTileRequested() {
 	pos := b.rng.Intn(len(b.tiles))
-	return b.tiles[pos]
+	b.tilePicked <- b.tiles[pos]
+}
+
+func (b *Bag) handleEvents(tileRequested chan bool) {
+	go func() {
+		for {
+			select {
+			case <-tileRequested:
+				b.onTileRequested()
+			}
+		}
+	}()
 }
 
 //NewBag creates a bag containing a specified set of tiles.
-func NewBag(tileCounts []TileCount) *Bag {
+func NewBag(tileCounts []TileCount, tileRequested chan bool, tilePicked chan tile.Tile) *Bag {
 	seed := time.Now().UTC().UnixNano()
 	tiles := make([]tile.Tile, 0)
 	for _, tc := range tileCounts {
@@ -40,15 +52,17 @@ func NewBag(tileCounts []TileCount) *Bag {
 			tiles = append(tiles, tc.Tile)
 		}
 	}
-	t := Bag{
-		tiles: tiles,
-		rng:   rand.New(rand.NewSource(seed)),
+	b := Bag{
+		tiles:      tiles,
+		tilePicked: tilePicked,
+		rng:        rand.New(rand.NewSource(seed)),
 	}
-	return &t
+	b.handleEvents(tileRequested)
+	return &b
 }
 
 //NewUKBag create a bag containing the UK distribution of tiles.
-func NewUKBag() *Bag {
+func NewUKBag(tileRequested chan bool, tilePicked chan tile.Tile) *Bag {
 	tileCounts := []TileCount{
 		{9, tile.Tile{Letter: 'A', Score: 1}},
 		{2, tile.Tile{Letter: 'B', Score: 3}},
@@ -77,5 +91,5 @@ func NewUKBag() *Bag {
 		{2, tile.Tile{Letter: 'Y', Score: 4}},
 		{1, tile.Tile{Letter: 'Z', Score: 10}},
 		{2, tile.Tile{Letter: '_', Score: 0}}}
-	return NewBag(tileCounts)
+	return NewBag(tileCounts, tileRequested, tilePicked)
 }
