@@ -35,7 +35,7 @@ func main() {
 	termbox.SetInputMode(termbox.InputEsc)
 	termbox.Flush()
 
-	logger := log.New(os.Stdout, "scrabtris ", log.LstdFlags|log.Lshortfile)
+	logger := log.New(os.Stdout, "wordris ", log.LstdFlags|log.Lshortfile)
 
 	bag.NewUKBag(tileRequested, tilePicked)
 	board.NewBoard(tileLanded, topReached, tilePicked, tileMoved, refreshRequested, clockTicked)
