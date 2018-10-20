@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+//Clock provides the timing of the game
 type Clock struct {
 	ticker   *time.Ticker
 	callback func()

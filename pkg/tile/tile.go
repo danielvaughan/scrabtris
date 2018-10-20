@@ -6,4 +6,5 @@ type Tile struct {
 	Score  int
 }
 
+//EmptyTile is used as the default tiles on the board
 var EmptyTile = Tile{Letter: ' ', Score: 0}
