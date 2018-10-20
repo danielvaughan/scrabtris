@@ -37,19 +37,18 @@ func (g *Game) waitKeyInput() {
 			if ev.Ch == 'q' || ev.Key == termbox.KeyCtrlC || ev.Key == termbox.KeyCtrlD {
 				fmt.Println("quit")
 				return
-			} else {
-				if g.clock.lock {
-					continue
-				} else if g.clock.gameover {
-					if ev.Key == termbox.KeySpace {
-						g.Start()
-					}
-					continue
-				} else if ev.Key == termbox.KeyArrowLeft {
-					g.tileMoved <- 'l'
-				} else if ev.Key == termbox.KeyArrowRight {
-					g.tileMoved <- 'r'
+			}
+			if g.clock.lock {
+				continue
+			} else if g.clock.gameover {
+				if ev.Key == termbox.KeySpace {
+					g.Start()
 				}
+				continue
+			} else if ev.Key == termbox.KeyArrowLeft {
+				g.tileMoved <- 'l'
+			} else if ev.Key == termbox.KeyArrowRight {
+				g.tileMoved <- 'r'
 			}
 		}
 	}
@@ -61,6 +60,7 @@ func (g *Game) checkBoard() {
 	}*/
 }
 
+//NewGame is a constructor for Game
 func NewGame(logger *log.Logger,
 	tileRequested chan bool,
 	tileLanded chan tile.Tile,

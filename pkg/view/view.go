@@ -6,10 +6,12 @@ import (
 	"strings"
 )
 
+//View is a rendering of the board
 type View struct {
 	nextTilePicked chan tile.Tile
 }
 
+//NewView is a constructor for view
 func NewView(nextTilePicked chan tile.Tile, refreshRequested chan string) *View {
 	v := View{
 		nextTilePicked: nextTilePicked,

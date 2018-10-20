@@ -15,7 +15,7 @@ type Dictionary struct {
 	logger *log.Logger
 }
 
-//FindWords, given an array of tiles, returns and array of tile arrays that are valid words
+//FindWords given an array of tiles, returns and array of tile arrays that are valid words
 func (d *Dictionary) FindWords(tt []tile.Tile) [][]tile.Tile {
 	var row string
 	for _, t := range tt {

@@ -13,6 +13,7 @@ type Clock struct {
 	lock     bool
 }
 
+//NewClock is a constructor for Clock
 func NewClock(callback func()) *Clock {
 	clock := &Clock{}
 	clock.callback = callback

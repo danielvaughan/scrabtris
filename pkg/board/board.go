@@ -102,7 +102,7 @@ func (b *Board) onTileMoved(direction rune) {
 	b.refreshRequested <- b.state()
 }
 
-func (b *Board) Row() []tile.Tile {
+func (b *Board) row() []tile.Tile {
 	return nil // b.squares[height]
 }
 
