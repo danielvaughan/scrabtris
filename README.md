@@ -8,6 +8,16 @@
 
 Like Tetris but with words
 
+## Installation
+```
+go get github.com/danielvaughan/wordris
+```
+
+## Play
+```
+wordris
+```
+
 [1]: https://godoc.org/github.com/danielvaughan/wordris?status.svg
 [2]: https://godoc.org/github.com/danielvaughan/wordris
 [3]: https://goreportcard.com/badge/github.com/danielvaughan/wordris

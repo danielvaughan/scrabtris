@@ -1,3 +1,11 @@
+# github.com/danielvaughan/scrabtris v0.0.0-20181020082939-c4c01940eddc
+github.com/danielvaughan/scrabtris/pkg/bag
+github.com/danielvaughan/scrabtris/pkg/board
+github.com/danielvaughan/scrabtris/pkg/dictionary
+github.com/danielvaughan/scrabtris/pkg/game
+github.com/danielvaughan/scrabtris/pkg/tile
+github.com/danielvaughan/scrabtris/pkg/view
+github.com/danielvaughan/scrabtris/pkg/scorer
 # github.com/davecgh/go-spew v1.1.0
 github.com/davecgh/go-spew/spew
 # github.com/mattn/go-runewidth v0.0.3

@@ -1,3 +1,5 @@
+github.com/danielvaughan/scrabtris v0.0.0-20181020082939-c4c01940eddc h1:tSIuggt9BYU7sXew77Kl4jao/O2GOFsJZFkoxK1/JAI=
+github.com/danielvaughan/scrabtris v0.0.0-20181020082939-c4c01940eddc/go.mod h1:ZSLWmobQWVKHyGNsjyjBxEo1qse5ntIvf03QD0FjJc4=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/google/uuid v0.0.0-20161128191214-064e2069ce9c h1:jWtZjFEUE/Bz0IeIhqCnyZ3HG6KRXSntXe4SjtuTH7c=
