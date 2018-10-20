@@ -14,7 +14,7 @@
 [6]: https://travis-ci.org/danielvaughan/wordris
 [7]: https://codecov.io/gh/danielvaughan/wordris/branch/master/graph/badge.svg
 [8]: https://codecov.io/gh/danielvaughan/wordris
-[9]: https://api.codacy.com/project/badge/Grade/b75a9233c6064ba4a61c70e44fbaae26
-[10]: https://www.codacy.com/app/danielvaughan/wordris?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=codetaming/indy-ingest&amp;utm_campaign=Badge_Grade
+[9]: https://api.codacy.com/project/badge/Grade/1cb6f57361f44e8f8b1df1586e1387f4
+[10]: https://www.codacy.com/app/danielvaughan/wordris?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=danielvaughan/wordris&amp;utm_campaign=Badge_Grade
 
 Like Tetris but with words
