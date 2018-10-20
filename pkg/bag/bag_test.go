@@ -13,7 +13,7 @@ var (
 )
 
 func TestPickingTiles(t *testing.T) {
-	tiles := []tile.Tile{{'A', 1}, {'B', 1}, {'C', 1}}
+	tiles := []tile.Tile{{Letter: 'A', Score: 1}, {Letter: 'B', Score: 1}, {Letter: 'C', Score: 1}}
 	tileCounts := []tileCount{
 		{1, tile.Tile{Letter: 'A', Score: 1}},
 		{1, tile.Tile{Letter: 'B', Score: 1}},
@@ -46,8 +46,8 @@ func pickTile(tiles []tile.Tile, t *testing.T) {
 	pickedTile := <-tilePicked
 	t.Log(fmt.Sprintf("Picked: %s", string(pickedTile.Letter)))
 	found := false
-	for _, tile := range tiles {
-		if pickedTile == tile {
+	for _, t := range tiles {
+		if pickedTile == t {
 			found = true
 		}
 	}

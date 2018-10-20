@@ -12,5 +12,5 @@ import (
 func TestScoreWord(t *testing.T) {
 	logger := log.New(os.Stdout, "test ", log.LstdFlags|log.Lshortfile)
 	s := scorer.Scorer{Logger: logger}
-	assert.Equal(t, 3, s.Score([]tile.Tile{{'C', 1}, {'A', 1}, {'T', 1}}))
+	assert.Equal(t, 3, s.Score([]tile.Tile{{Letter: 'C', Score: 1}, {Letter: 'A', Score: 1}, {Letter: 'T', Score: 1}}))
 }
